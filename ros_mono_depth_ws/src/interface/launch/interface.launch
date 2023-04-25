@@ -1,0 +1,3 @@
+<launch> 
+    <node pkg="interface" name="interface" type="interface.py" output="screen"/>
+</launch>

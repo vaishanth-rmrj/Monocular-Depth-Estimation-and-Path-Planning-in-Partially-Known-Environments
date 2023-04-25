@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+<!-- Arguments for launch file with defaults provided -->
+<arg name="database_path"     default="$(find wheelchair_vision)/database/rtabmap.db"/>
+<arg name="rgb_topic"   default="/camera/color/image_raw"/>
+<arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
+<arg name="camera_info_topic" default="/camera/color/camera_info"/>  
+
+<arg name="wait_for_transform"  default="0.2"/>
+
+<group ns="rtabmap">
+    <!-- Odometry : ONLY for testing without the actual robot! /odom TF should not be already published. -->
+    <node pkg="rtabmap_odom" type="rgbd_odometry" name="rgbd_odometry" output="screen">
+        <param name="frame_id"                    type="string" value="base_footprint"/>
+        <param name="wait_for_transform_duration" type="double" value="$(arg wait_for_transform)"/>
+        <param name="Reg/Force3DoF"               type="string" value="true"/>
+        <param name="Vis/InlierDistance"          type="string" value="0.05"/>
+
+        <remap from="rgb/image"       to="$(arg rgb_topic)"/>
+        <remap from="depth/image"     to="$(arg depth_topic)"/>
+        <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+    </node>
+</group>
+
+<!-- config saved -->
+<!-- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find wheelchair_vision)/config/rtabmap_viz_config.rviz"/> -->
+
+</launch>

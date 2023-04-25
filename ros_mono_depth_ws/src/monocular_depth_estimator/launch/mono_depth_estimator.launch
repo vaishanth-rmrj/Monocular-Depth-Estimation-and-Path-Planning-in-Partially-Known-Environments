@@ -1,0 +1,18 @@
+<launch> 
+    <node pkg="monocular_depth_estimator" type="depth_estimator.py" name="depth_estimator" output="screen" respawn="true">
+        <param name="rgb_topic" value="/camera/color/image_raw"/>
+        <param name="depth_topic" value="/camera/mono/depth"/>
+        <param name="point_cloud_topic" value="/camera/point_cloud"/>
+
+        <!-- convert depth map to grayscale image -->
+        <param name="grayscale" type="bool" value="false"/>
+
+        <!-- to view both rgb and depth image -->
+        <param name="debug" type="bool" value="false"/>
+    </node>
+
+    <!-- launch rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find monocular_depth_estimator)/config/config.rviz"/>
+
+
+</launch> 

@@ -1,0 +1,42 @@
+<launch>    
+    <!-- Robot pose -->
+    <!-- Inititalize it's position in the desired location inside the world -->
+    <!-- pose : 5.0627 -0.057 0.100000 0 0 -1.593506 -->
+    <!-- pose 2  -5.204683 -18.104129 0.004496 0 0 1.722056 -->
+    <arg name="x" default="0.209352"/>
+    <arg name="y" default="11.614045"/>
+    <arg name="z" default="0.004501"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="-1.632739"/>
+    <arg name="world_file" default="$(find simulator)/worlds/hospital.world" />
+    <arg name="show_gui" default="false" />
+    
+    <!-- launch gazebo simulation world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_file)"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="$(arg show_gui)"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>
+
+    <!-- send robot descp urdf to param server -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find simulator)/urdf/wheelchair.urdf'" />
+
+    <!-- Send fake joint values-->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="use_gui" value="false"/>
+    </node>
+
+    <!-- Send robot states to tf -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen"/>
+
+    <!-- Spawn the robot in gazebo simulation -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
+            args="-urdf -param robot_description -model my_robot 
+                -x $(arg x) -y $(arg y) -z $(arg z)
+                -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>        
+
+</launch>

@@ -1,0 +1,33 @@
+#:kivy 2.1.0
+
+<MapWidget>:
+    FloatLayout:
+        on_touch_down: root.on_map_touch(args[1])
+        Image:
+            id: my_image
+            source: '2d-floor_plan.png'
+            allow_stretch: True
+            keep_ratio: True
+            size: 900, 600
+
+<MapScreen>:
+    FloatLayout:
+        GridLayout:
+            cols: 1
+            pos_hint: {"top": .895, "left": 1}
+            size_hint: 1, .795
+            Scatter:
+                id: scatter
+                pos_hint: {"top": .895, "left": 1}
+                size_hint: (None,None)
+                size: 900, 600                
+                
+                do_rotation:False
+                scale_min: 0.8
+                scale_max: 1.5
+                MapWidget:
+                    name: "map"
+
+
+
+

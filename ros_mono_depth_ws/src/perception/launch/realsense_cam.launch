@@ -1,0 +1,60 @@
+<launch>
+
+<arg name="align_depth"     default="true"/>
+
+<!-- IMU -->
+<arg name="enable_gyro"     default="true"/>
+<arg name="enable_accel"     default="true"/>
+
+<!-- Visulaization -->
+<arg name="show_rviz"     default="false"/>
+
+<!-- optional params -->
+<arg name="filters"         default=""/>
+<arg name="depth_width"     default="640"/>
+<arg name="depth_height"    default="480"/>
+<arg name="color_width"     default="640"/>
+<arg name="color_height"    default="480"/>
+<arg name="color_fps"       default="30"/>
+<arg name="depth_fps"       default="30"/>
+
+<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    
+    <!-- aligns depth to color image -->
+    <arg name="align_depth"     value="$(arg align_depth)"/>
+    <!-- Use unite_imu_method:="copy" if imu topics keep stopping -->
+    <arg name="unite_imu_method"     value="linear_interpolation"/>
+    <!-- enables gyro and accel sensor -->
+    <arg name="enable_gyro"     value="$(arg enable_gyro)"/>
+    <arg name="enable_accel"     value="$(arg enable_accel)"/>
+
+    <!-- optional params-->
+    <arg name="filters"         value="$(arg filters)"/>
+    <arg name="depth_width"     value="$(arg depth_width)"/>
+    <arg name="depth_height"    value="$(arg depth_height)"/>
+    <arg name="color_width"     value="$(arg color_width)"/>
+    <arg name="color_height"    value="$(arg color_height)"/>
+    <arg name="color_fps"       value="$(arg color_fps)"/>
+    <arg name="depth_fps"       value="$(arg depth_fps)"/>
+</include>
+
+<!-- node to process the camera's imu data -->
+<node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_madgwick" output="screen" respawn="false" >
+    
+    <param name="fixed_frame" value="odom" />
+    <param name="use_mag" value="false" />
+    <param name="publish_tf" value="false" />
+    <!-- <param name="world_frame" value="false" /> -->
+    <!-- raw data input -->
+    <remap from="imu/data_raw" to="/camera/imu" />
+    <!-- output processed imu data -->
+    <remap from="/imu/data" to="/rtabmap/imu" />
+ </node>
+
+<group if="$(arg show_rviz)">
+    <!-- config saved -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find perception)/config/realsense_viz_config.rviz"/>
+</group>
+
+
+</launch>

@@ -1,0 +1,466 @@
+#:kivy 2.1.0
+
+<ControlScreen>
+    name: "control_screen"
+   
+    BoxLayout:
+        orientation: "vertical"
+
+        FloatLayout:
+            size_hint: None, None
+            size: self.parent.width, self.parent.height * 0.1
+
+            canvas.before:
+                Color:
+                    rgba: (63/255.0, 81/255.0, 181/255.0, 1 )
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            Button:
+                id: start_btn    
+                size_hint: None, None
+                size: 25, 25
+                pos_hint: {"center_x": 0.95, "center_y": 0.5}
+                background_normal: 'assets/icons/menu.png'
+                background_down: 'assets/icons/menu.png'
+                border: (0, 0, 0, 0)
+                on_press: root.start_btn_down()   
+
+        ScreenManager:
+            id: control_screen_manager
+            
+            ### manual control screen ###
+            Screen:
+                name: "manual_control"    
+
+                FloatLayout:  
+                    size_hint: None, None
+                    size: self.parent.width, self.parent.height 
+
+                    canvas.before:
+                        Color:
+                            rgba: (224/255, 224/255, 224/255, 1)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                    Label:
+                        text: "Use the arrows to control the wheelchair manually."
+                        pos_hint: {'center_x': .5, 'center_y':0.83} 
+                        halign: "center"
+                        font_size: 20.0
+                        color: 0, 0, 0, 0.7
+                    
+                    BoxLayout:
+                        size_hint: None, None
+                        size: self.parent.width * .6, self.parent.height * .6
+                        pos_hint: {'center_x': .5, 'center_y':.45} 
+                        spacing: 20
+                        
+                        FloatLayout:  
+                            size_hint: None, None
+                            size: self.parent.width * .7, self.parent.height
+                            padding: 10.0
+
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1, 0.5
+                                RoundedRectangle:
+                                    size: self.size
+                                    pos: self.pos
+                                    radius: [10]                                     
+
+                            Button:
+                                id: manual_up_btn    
+                                size_hint: None, None
+                                size: 70, 70
+                                pos_hint: {'center_x':.5, 'center_y':.75}
+                                background_normal: 'assets/icons/up-arrow.png'
+                                background_down: 'assets/icons/up-arrow-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.control_btn_pressed('w')
+                                on_release: root.control_btn_up()
+
+                            Button:
+                                id: manual_left_btn    
+                                size_hint: None, None
+                                size: 70, 70
+                                pos_hint: {'center_x':.25, 'center_y':.5}
+                                background_normal: 'assets/icons/left-arrow.png'
+                                background_down: 'assets/icons/left-arrow-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.control_btn_pressed('a')
+                                on_release: root.control_btn_up()
+
+                                
+                                
+
+                            Button:
+                                id: manual_right_btn    
+                                size_hint: None, None
+                                size: 70, 70
+                                pos_hint: {'center_x':.75, 'center_y':.5}
+                                background_normal: 'assets/icons/right-arrow.png'
+                                background_down: 'assets/icons/right-arrow-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.control_btn_pressed('d')
+                                on_release: root.control_btn_up()                                   
+                                
+                                
+
+                            Button:
+                                id: manual_down_btn    
+                                size_hint: None, None
+                                size: 70, 70
+                                pos_hint: {'center_x':.5, 'center_y':.25}
+                                background_normal: 'assets/icons/down-arrow.png'
+                                background_down: 'assets/icons/down-arrow-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.control_btn_pressed('s')
+                                on_release: root.control_btn_up()                                        
+                                
+                        
+                        FloatLayout:
+                            size_hint: None, None
+                            size: self.parent.width * .2, self.parent.height
+
+                            canvas.before:
+                                Color:
+                                    rgba: 1, 1, 1, 0.5
+                                RoundedRectangle:
+                                    size: self.size
+                                    pos: self.pos
+                                    radius: [10]   
+                            Label:
+                                text: "Velocity"
+                                pos_hint: {'center_x':.5, "center_y": 0.9}
+                                color: 0, 0, 0, 0.7
+                            
+                            Label:
+                                id: velocity_scale_label
+                                text: "10%"
+                                pos_hint: {'center_x':.5, "center_y": 0.8}
+                                color: 0, 0, 0, 0.7
+
+                            Button:
+                                id: velocity_plus    
+                                size_hint: None, None
+                                size: 60, 60
+                                pos_hint: {'center_x':.5, 'center_y':.55}
+                                background_normal: 'assets/icons/plus.png'
+                                background_down: 'assets/icons/plus-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.update_velocity_scale(1)
+                            
+                            Button:
+                                id: velocity_minus 
+                                size_hint: None, None
+                                size: 60, 60
+                                pos_hint: {'center_x':.5, 'center_y':.2}
+                                background_normal: 'assets/icons/minus.png'
+                                background_down: 'assets/icons/minus-active.png'
+                                border: (0, 0, 0, 0)
+                                on_press: root.update_velocity_scale(0)
+                                                                        
+                                        
+
+            ### semi auto control screen ###
+            Screen:
+                name: "semi_auto_control"
+
+                BoxLayout:
+                    orientation: "vertical"    
+                    canvas.before:
+                        Color:
+                            rgba: (224/255, 224/255, 224/255, 1)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+
+                    GridLayout:
+                        cols: 2
+
+                        FloatLayout:    
+                            FloatLayout:    
+                                size_hint: None, None
+                                size: self.parent.width * .9, self.parent.height * .9  
+                                pos_hint: {'center_x': .5, 'center_y':.5}                       
+                                Image:
+                                    source: 'assets/images/2d-floor_plan.png'
+                                    allow_stretch: True
+                                    keep_ratio: True
+                                    pos_hint: {'center_x': .5, 'center_y':.4} 
+                    
+                        FloatLayout: 
+
+                            Label:
+                                text: "Use the arrows to control the wheelchair manually."
+                                pos_hint: {'center_x': .5, "center_y": 0.8}
+                                halign: "center"
+                                font_size: 16.0
+                                color: 0, 0, 0, 0.7
+                        
+                            FloatLayout:  
+                                size_hint: None, None
+                                size: self.parent.width * .7, self.parent.height * .6
+                                pos_hint: {'center_x': .5, 'center_y':.4}
+                                padding: 10.0
+
+                                canvas.before:
+                                    Color:
+                                        rgba: 1, 1, 1, 0.5
+                                    RoundedRectangle:
+                                        size: self.size
+                                        pos: self.pos
+                                        radius: [10]                                         
+
+                                Button: 
+                                    size_hint: None, None
+                                    size: 70, 70
+                                    pos_hint: {'center_x':.5, 'center_y':.75}
+                                    background_normal: 'assets/icons/up-arrow.png'
+                                    background_down: 'assets/icons/up-arrow-active.png'
+                                    border: (0, 0, 0, 0)
+
+
+                                Button: 
+                                    size_hint: None, None
+                                    size: 70, 70
+                                    pos_hint: {'center_x':.25, 'center_y':.5}
+                                    background_normal: 'assets/icons/left-arrow.png'
+                                    background_down: 'assets/icons/left-arrow-active.png'
+                                    border: (0, 0, 0, 0)
+                                                                                        
+
+                                Button: 
+                                    size_hint: None, None
+                                    size: 70, 70
+                                    pos_hint: {'center_x':.75, 'center_y':.5}
+                                    background_normal: 'assets/icons/right-arrow.png'
+                                    background_down: 'assets/icons/right-arrow-active.png'
+                                    border: (0, 0, 0, 0)
+
+                                Button: 
+                                    size_hint: None, None
+                                    size: 70, 70
+                                    pos_hint: {'center_x':.5, 'center_y':.25}
+                                    background_normal: 'assets/icons/down-arrow.png'
+                                    background_down: 'assets/icons/down-arrow-active.png'
+                                    border: (0, 0, 0, 0)
+                                    
+
+            ### auto control screen ###
+            Screen:
+                name: "auto_control"
+                FloatLayout:
+                    canvas.before:
+                        Color:
+                            rgba: (224/255, 224/255, 224/255, 1)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+
+                    FloatLayout:    
+                        size_hint: None, None
+                        size: self.parent.width * .8, self.parent.height * .8  
+                        pos_hint: {'center_x': .4, 'center_y':.5}                       
+                        Image:
+                            source: 'assets/images/2d-floor_plan.png'
+                            allow_stretch: True
+                            keep_ratio: True
+                            pos_hint: {'center_x': .5, 'center_y':.5} 
+                
+                    BoxLayout: 
+                        orientation: 'vertical'
+                        padding: 20
+                        spacing: 20
+                        size_hint: None, None
+                        size: self.parent.width * .15, self.parent.height * .6 
+                        pos_hint: {'center_x': .85, "center_y": 0.5}
+
+                        canvas.before:
+                            Color:
+                                rgba: 1, 1, 1, 0.5
+                            RoundedRectangle:
+                                size: self.size
+                                pos: self.pos
+                                radius: [10]
+
+                        Label:
+                            text: "Actions"
+                            halign: "center"
+                            font_size: 16.0
+                            color: 0, 0, 0, 0.7
+
+                        Button: 
+                            size_hint: None, None
+                            size: 50, 50
+                            pos_hint: {'center_x': 0.5}
+                            background_normal: 'assets/icons/location.png'
+                            background_down: 'assets/icons/location-active.png'
+                            border: (0, 0, 0, 0)
+                                                                            
+
+                        Button: 
+                            size_hint: None, None
+                            size: 50, 50
+                            pos_hint: {'center_x': 0.5}
+                            background_normal: 'assets/icons/navigator.png'
+                            background_down: 'assets/icons/navigator-active.png'
+                            border: (0, 0, 0, 0)
+                        
+                        Button: 
+                            size_hint: None, None
+                            size: 50, 50
+                            pos_hint: {'center_x': 0.5}
+                            background_normal: 'assets/icons/replan.png'
+                            background_down: 'assets/icons/replan-active.png'
+                            border: (0, 0, 0, 0)
+
+
+        ### bottom nav ###
+        FloatLayout:
+            size_hint: None, None
+            size: self.parent.width, self.parent.height*0.15
+            canvas.before:
+                Color:
+                    rgba: (63/255.0, 81/255.0, 181/255.0, 1 )
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+
+            BoxLayout:
+                padding: 20
+                spacing: 20
+                size_hint: None, None
+                size: self.parent.width*.8, self.parent.height
+
+                Button:
+                    text: "Manual" 
+                    # text_color: "black"
+                    font_style: "Button"
+                    background_color: (1, 1, 1, 0)
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 0.4
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [25]   
+                    on_release:
+                        control_screen_manager.current = "manual_control"
+                        control_screen_manager.transition.direction = "up"
+                    
+
+                Button:
+                    text: "Semi-autonomus" 
+                    # text_color: "black"
+                    font_style: "Button"
+                    background_color: (1, 1, 1, 0)
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 0.4
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [25]  
+                    on_release:
+                        control_screen_manager.current = "semi_auto_control"
+                        control_screen_manager.transition.direction = "up"
+                    
+
+
+                Button:
+                    text: "Autonomous" 
+                    # text_color: "grey"
+                    font_style: "Button"
+                    color: 1, 1, 1, 1
+                    background_color: (1, 1, 1, 0)
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 0.4
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [25] 
+                    on_release:
+                        control_screen_manager.current = "auto_control"
+                        control_screen_manager.transition.direction = "up"
+
+
+            Button:
+                size_hint: None, None
+                size: 60, 60
+                pos_hint: {'x':.9, 'center_y':.5}
+                background_normal: 'assets/icons/stop-sign.png'
+                background_down: 'assets/icons/stop-sign-active.png'
+                border: (0, 0, 0, 0)
+                on_release:
+                    root.manager.current = "start_screen"
+                    root.manager.transition.direction = "right"
+                        
+
+
+
+#     MDNavigationDrawer:
+#         id: nav_drawer
+    
+#         orientation: 'vertical'
+#         padding: "8dp"
+#         spacing: "8dp"
+                
+#         ScrollView:              
+            
+#             MDList:
+#                 id: md_list
+#                 OneLineIconListItem:
+#                     text: "Configurations"
+            
+#                     IconLeftWidget:
+#                         icon: "face-profile"                       
+            
+#                 OneLineIconListItem:
+#                     text: "Dark mode"
+#                     MDSwitch:
+#                         pos_hint : {"center_x": .8, "center_y":.5}
+#                         on_active: app.toggle_dark_mode(*args)                       
+            
+#                 OneLineIconListItem:
+#                     text: "Settings"
+            
+#                     IconLeftWidget:
+#                         icon: "logout"
+
+
+
+             
+# utitlities
+<MyButton>:
+    state_image: self.background_normal if self.state == 'normal' else self.background_down
+    disabled_image: self.background_disabled_normal if self.state == 'normal' else self.background_disabled_down
+    canvas:
+        Color:
+            rgba: 0,0,0,0
+
+        BorderImage:
+            border: self.border
+            pos: self.pos
+            size: self.size
+            source: self.state_image
+
+        Color:
+            rgba: (1, 1, 1, 1) if root.icon != None else (1,1,1,0)
+
+        Rectangle:
+            source: root.icon
+            size: (self.texture_size[1],self.texture_size[1]) if self.icon_size == (0,0) else self.icon_size
+            pos: self.pos
+
+        Color:
+            rgba: 1, 1, 1, 1
+
+        Rectangle:
+            texture: self.texture
+            size: self.texture_size
+            pos: int(self.center_x - self.texture_size[0] / 2.)+dp(root.icon_padding), int(self.center_y - self.texture_size[1] / 2.)
+
