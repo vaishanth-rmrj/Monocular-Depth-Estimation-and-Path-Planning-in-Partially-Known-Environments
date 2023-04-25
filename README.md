@@ -45,7 +45,7 @@ roslaunch robot_launcher simulation_system.launch
 
 ## Preview
 1. 3D Mapping 
-<img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/3d_mapping.gif" />
+<img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/3d_mapping.gif" width=300px/>
 3. Path planning
 <img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/grid_map_path_planning.gif" width=400px />
 <img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/big_map_path_planning.gif" width=400px />
