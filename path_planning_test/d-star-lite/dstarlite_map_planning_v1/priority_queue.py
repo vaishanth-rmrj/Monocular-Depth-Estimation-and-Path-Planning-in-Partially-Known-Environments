@@ -21,8 +21,7 @@ class PriorityQueue:
         '''
         to pop the elem with smallest key
         '''
-        item = heapq.heappop(self.elements)
-        return item
+        return heapq.heappop(self.elements)
 
     def top_key(self):
         '''

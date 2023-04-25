@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # cv2.setMouseCallback('map', get_click_point)
     # cv2.waitKey(0)
 
-
+    
     map_obj = MapGrid(map_img, inflation_radius=15)
     robot_curr_pose = (124, 247)
     goal_pos = (217, 57)

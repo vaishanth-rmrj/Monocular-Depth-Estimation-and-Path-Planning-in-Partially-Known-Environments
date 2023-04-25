@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # map details
     # dimension: 41 x 35 m / 820x700px 
     # resolution: 0.05m/px
-    map_img = cv2.imread("dstarlite_map_based_v4/assets/Map_2.jpg", 0) 
+    map_img = cv2.imread("assets/Map_2.jpg", 0) 
     map_img = np.where(map_img > 150, 1, 0)
     map_img = np.array(map_img, dtype=np.uint8)
 

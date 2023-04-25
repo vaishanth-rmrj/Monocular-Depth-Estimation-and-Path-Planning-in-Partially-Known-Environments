@@ -8,7 +8,7 @@ import numpy as np
 import time
 
 class DStarLite(object):
-    def __init__(self, map_obj, start, goal, view_range=50):
+    def __init__(self, map_obj, start, goal, view_range=22):
         self.start_node = start
         self.curr_node = start
         self.goal_node = goal
@@ -56,21 +56,7 @@ class DStarLite(object):
     def get_click_point(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
             print('Click point: ({}, {})'.format(x, y))
-            self.set_goal((x, y))
-
-            # # for debugging only
-            # true_map = self.org_mapgrid.true_map.copy()
-            # # processing true map grid        
-            # true_map = render_to_rgb(true_map)
-            # # adding curr robot pose amd goal pose
-            # true_robot_pose = self.org_mapgrid.get_true_pt(self.curr_node[::-1])
-            # # true_goal_node = self.org_mapgrid.get_true_pt(self.goal_node[::-1])
-            # cv2.circle(true_map, true_robot_pose, 2, [255, 109, 83], 5)
-            # cv2.circle(true_map, (x, y), 2, [255, 109, 83], 5)
-            # cv2.imshow("Map Grid 2", true_map)
-            # cv2.waitKey(0)
-
-            
+            self.set_goal((x, y))            
     
     def calc_key(self, node_pt):
         node_g_val = self.get_gval(node_pt)
@@ -173,12 +159,9 @@ class DStarLite(object):
     def get_path(self):
         curr_node = self.curr_node
         path = []
-        while True:
-            if curr_node in self.back_pointers:
-                path.append(curr_node)
-                curr_node = self.back_pointers[curr_node]            
-            else:
-                break     
+        while curr_node in self.back_pointers:
+            path.append(curr_node)
+            curr_node = self.back_pointers[curr_node]   
         return path
     
     def render_pathplanning(self, grid_map, explored_grid_map, start_pt, curr_pt, goal_pt, path):
@@ -228,31 +211,29 @@ class DStarLite(object):
         # Set the mouse callback function
         cv2.setMouseCallback("Map Grid", self.get_click_point)
 
-        if cv2.waitKey(70) == ord('q'):
+        if cv2.waitKey(24) == ord('q'):
             return 0
-
-
             
     def move_and_replan(self):
 
         # get local region for the curr node
-        local_reg = self.org_mapgrid.get_local_region(self.curr_node, self.view_range)
-        unexplored_walls = self.explored_grid.get_unexplored_walls(local_reg)
-        self.explored_grid.update_walls(unexplored_walls)
+        local_region_pixels, pixel_id = self.org_mapgrid.get_local_region(self.curr_node, self.view_range)
+        unexplored_walls_id = self.explored_grid.get_unexplored_walls(local_region_pixels, pixel_id)        
+        self.explored_grid.update_walls(unexplored_walls_id)
 
         # compute shortest path to goal traverses from goal node to start node
         # this path is with the explored obstacles
         self.compute_shortest_path()
         
         # for debugging
-        # self.render_pathplanning(
-        #     grid_map=self.org_mapgrid.grid_map,
-        #     explored_grid_map=self.explored_grid.grid_map,
-        #     start_pt=self.start_node,
-        #     curr_pt=self.curr_node,
-        #     goal_pt=self.goal_node,
-        #     path=self.get_path()
-        # )
+        self.render_pathplanning(
+            grid_map=self.org_mapgrid.grid_map,
+            explored_grid_map=self.explored_grid.grid_map,
+            start_pt=self.start_node,
+            curr_pt=self.curr_node,
+            goal_pt=self.goal_node,
+            path=self.get_path()
+        )
         
         last_node = self.curr_node
         while self.curr_node != self.goal_node:            
@@ -261,8 +242,8 @@ class DStarLite(object):
                 raise Exception("no path found")
 
             self.curr_node = self.fetch_lowest_cost_neighbour(self.curr_node)
-            local_roi = self.org_mapgrid.get_local_region(self.curr_node, self.view_range)
-            new_walls = self.explored_grid.get_unexplored_walls(local_roi)
+            local_region_pixels, pixel_id = self.org_mapgrid.get_local_region(self.curr_node, self.view_range)
+            new_walls = self.explored_grid.get_unexplored_walls(local_region_pixels, pixel_id)
 
             if new_walls:
                 self.explored_grid.update_walls(new_walls)
@@ -284,14 +265,14 @@ class DStarLite(object):
                 self.compute_shortest_path()
 
             # for debugging
-            # self.render_pathplanning(
-            #     grid_map=self.org_mapgrid.grid_map,
-            #     explored_grid_map=self.explored_grid.grid_map,
-            #     start_pt=self.start_node,
-            #     curr_pt=self.curr_node,
-            #     goal_pt=self.goal_node,
-            #     path=self.get_path()
-            # )
+            self.render_pathplanning(
+                grid_map=self.org_mapgrid.grid_map,
+                explored_grid_map=self.explored_grid.grid_map,
+                start_pt=self.start_node,
+                curr_pt=self.curr_node,
+                goal_pt=self.goal_node,
+                path=self.get_path()
+            )
 
             self.display_map(show_path=True)
             if self.is_new_goal:

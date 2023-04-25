@@ -37,6 +37,8 @@ class MapGrid:
         dist_transform = cv2.distanceTransform(map_img, cv2.DIST_L2, 3)
         img_normalized = cv2.normalize(dist_transform, None, 0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         img_dist_thres = np.where(img_normalized*threshold_reduction > 1, 1, img_normalized*threshold_reduction)
+        # Use the round function to reduce decimal places to 3
+        img_dist_thres = np.round(img_dist_thres, 3)
 
         return (img_dist_thres*255).astype(np.uint8)
 
@@ -93,12 +95,12 @@ class MapGrid:
 
     
     def cost(self, from_node, to_node):
-        if from_node in self.walls or to_node in self.walls:
+        # if from_node in self.walls or to_node in self.walls:
+        if self.grid_map[from_node[::-1]] == 0 or self.grid_map[to_node[::-1]] == 0:
             return float('inf')
         else:
-            # print(self.grid_map[to_node[::-1]])
-            return 1 + abs(1 - self.grid_map[to_node[::-1]])
-            # return 1 
+            # print(round(abs(1 - self.grid_map[to_node[::-1]]), 3))
+            return 1 + round(abs(1 - self.grid_map[to_node[::-1]]), 3)
 
 
     def neighbors(self, vertex, no_move_direction=4):
@@ -119,7 +121,7 @@ class MapGrid:
         '''
         (x, y) = vertex
         return 0 <= x < self.width and 0 <= y < self.height
-
+    
     def get_local_region(self, pos, view_dist=2):
         '''
         to fetch the local reg surrounding the curr pos
@@ -129,27 +131,51 @@ class MapGrid:
         1 - freespace
         '''
         (px, py) = pos
-        local_nodes = [(x, y) for x in range(px - view_dist, px + view_dist + 1)
-                        for y in range(py - view_dist, py + view_dist + 1)
-                        if self.in_bounds((x, y))]
-                
-        return {node: 0 if self.grid_map[(node[1], node[0])] == 0 else 1 for node in local_nodes}
+
+        w, h = 2*view_dist, 2*view_dist
+
+        # calculate the top-left corner of the rectangle
+        x_tl = int(px - (w / 2))
+        y_tl = int(py - (h / 2))
+
+        # check if the pixels' spatial positions are within the image bounds
+        # create a meshgrid of the pixel positions
+        yy, xx = np.meshgrid(np.arange(y_tl, (y_tl+h)+1), np.arange(x_tl, (x_tl+w)+1), indexing='ij')
+        # create a mask for pixels within the image bounds        
+        mask = (yy >= 0) & (yy < self.grid_map.shape[0]) & (xx >= 0) & (xx < self.grid_map.shape[1])        
+        # apply the mask to the pixel positions to get the positions within the image bounds
+        yy, xx = yy[mask], xx[mask]
+        
+        # set the limits to slice from true map
+        left_limit, right_limit = min(xx), max(xx)
+        upper_limit, lower_limit = min(yy), max(yy)
+
+        # use the masked pixel positions to access the corresponding pixel values in the region
+        local_region_pixels = self.grid_map[upper_limit:lower_limit, left_limit:right_limit]
+        pixel_index = np.dstack(np.meshgrid(np.arange(upper_limit, lower_limit), np.arange(left_limit, right_limit ), indexing='ij'))
+        
+        return local_region_pixels, pixel_index
+        
 
 
 class ExploredGrid(MapGrid):
 
-    def get_unexplored_walls(self, local_reg):
+    def get_unexplored_walls(self, local_region_pixels, pixel_index):
         '''
         return: walls not explored already
         '''
-        new_detected_walls = {node for node, node_type in local_reg.items() if node_type == 0}        
+        # checking if pixel is obstacle and getting its index
+        new_detected_walls = pixel_index[np.where(local_region_pixels == 0)]
+        new_detected_walls = np.flip(new_detected_walls, axis=1)
+        new_detected_walls = set(map(tuple, new_detected_walls))       
         return new_detected_walls - self.walls
 
     def update_walls(self, new_walls):
 
-        # updating new walls to explored map
-        for wall in new_walls:
-            wall_x, wall_y = wall
-            self.grid_map[(wall_y, wall_x)] = 0
+        # update grid map
+        # new_walls_array = np.array(list(new_walls))
+        # new_walls_array = np.flip(new_walls_array, axis=1)
+        # self.grid_map[tuple(new_walls_array.T)] = 0
 
+        # update obstacles set
         self.walls.update(new_walls)
