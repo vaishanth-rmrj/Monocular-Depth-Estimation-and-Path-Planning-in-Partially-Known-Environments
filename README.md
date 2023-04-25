@@ -43,9 +43,16 @@ catkin_make
 roslaunch robot_launcher simulation_system.launch
 ```
 
+## Preview
+1. 3D Mapping 
+<img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/3d_mapping.gif" />
+3. Path planning
+<img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/grid_map_path_planning.gif" width=400px />
+<img src="https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/blob/main/git_extras/big_map_path_planning.gif" width=400px />
+
 ## Credits
 - [MiDas: A PyTorch implementation of the paper "Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-shot Cross-dataset Transfer"](https://github.com/intel-isl/MiDaS)
-- [D* Lite path planning algorithm implementation in Python](https://github.com/PedroHenrique-git/D-Star-Lite)
+- [D* Lite path planning algorithm implementation in Python]([https://github.com/PedroHenrique-git/D-Star-Lite](https://github.com/vaishanth-rmrj/Monocular-Depth-Estimation-and-Path-Planning-in-Partially-Known-Environments/tree/main/path_planning_test/d-star-lite))
 - [Gazebo simulation environment](http://gazebosim.org/)
 - [RViz visualization tool](http://wiki.ros.org/rviz)
 
